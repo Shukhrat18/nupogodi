@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="tg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Китобхонаи Раҳима | Системаи идоракунӣ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f5f9; }
+    .table-container { max-height: 70vh; overflow-y: auto; border-radius: 8px; }
+    tr:hover td { background-color: #e2e8f0; }
+    .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+    .modal.active { display: flex; }
+    .stat-card { transition: all 0.2s; }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body class="p-2 md:p-4">
+
+  <div id="app" class="max-w-7xl mx-auto bg-white shadow-2xl rounded-lg p-3 md:p-6">
+    
+    <!-- Сарлавҳа -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4 gap-3">
+      <h1 class="text-xl md:text-3xl font-bold text-gray-800 flex items-center gap-2">
+        <i class="fas fa-book-open text-blue-600"></i> 
+        Китобхонаи Раҳима
+      </h1>
+      <div class="flex flex-wrap gap-2">
+        <button onclick="document.getElementById('fileInput').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg shadow text-sm transition">
+          <i class="fas fa-upload mr-1"></i> Воридоти Excel
+        </button>
+        <input type="file" id="fileInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileUpload(event)">
+        
+        <button onclick="openAddBookModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg shadow text-sm transition">
+          <i class="fas fa-plus mr-1"></i> Иловаи китоб
+        </button>
+        
+        <button onclick="exportToExcel()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg shadow text-sm transition">
+          <i class="fas fa-download mr-1"></i> Захира
+        </button>
+        
+        <button onclick="checkStorageData()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg shadow text-sm transition">
+          <i class="fas fa-database mr-1"></i> Санҷиш
+        </button>
+      </div>
+    </div>
+
+    <!-- Сарлавҳаҳои оморӣ -->
+    <div class="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3 mb-6">
+      <div class="stat-card bg-slate-100 p-3 rounded-lg text-center">
+        <p class="text-xs text-gray-600">Ҳама</p>
+        <p id="totalBooks" class="text-2xl font-bold text-gray-800">0</p>
+      </div>
+      <div class="stat-card bg-orange-50 p-3 rounded-lg text-center">
+        <p class="text-xs text-orange-600">Бадеӣ</p>
+        <p id="totalBadii" class="text-2xl font-bold text-orange-800">0</p>
+      </div>
+      <div class="stat-card bg-green-50 p-3 rounded-lg text-center">
+        <p class="text-xs text-green-600">Таълимӣ</p>
+        <p id="totalTalimi" class="text-2xl font-bold text-green-800">0</p>
+      </div>
+      <div class="stat-card bg-purple-50 p-3 rounded-lg text-center">
+        <p class="text-xs text-purple-600">Тахассусӣ</p>
+        <p id="totalTakhasusi" class="text-2xl font-bold text-purple-800">0</p>
+      </div>
+      <div class="stat-card bg-rose-50 p-3 rounded-lg text-center">
+        <p class="text-xs text-rose-600">Президент</p>
+        <p id="totalPresident" class="text-2xl font-bold text-rose-800">0</p>
+      </div>
+      <div class="stat-card bg-cyan-50 p-3 rounded-lg text-center">
+        <p class="text-xs text-cyan-600">Тоҷикон</p>
+        <p id="totalTojikon" class="text-2xl font-bold text-cyan-800">0</p>
+      </div>
+    </div>
+
+    <!-- Филтрҳо -->
+    <div class="flex flex-col md:flex-row gap-2 mb-4">
+      <div class="relative flex-grow">
+        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+        <input type="text" id="searchInput" placeholder="Ҷустуҷӯ аз рӯи ном, № китоб ё гиранда..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 text-sm">
+      </div>
+      <select id="categoryFilter" class="border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-400 text-sm bg-white">
+        <option value="">Ҳамаи категорияҳо</option>
+        <option value="БАДЕӢ">БАДЕӢ</option>
+        <option value="ТАЪЛИМӢ">ТАЪЛИМӢ</option>
+        <option value="ТАХАССУСӢ">ТАХАССУСӢ</option>
+        <option value="ПРЕЗИДЕНТ">ПРЕЗИДЕНТ</option>
+        <option value="ТОҶИКОН">ТОҶИКОН</option>
+      </select>
+      <button onclick="resetFilters()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2.5 rounded-lg transition text-sm">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+    </div>
+
+    <!-- Ҷадвали китобҳо -->
+    <div class="table-container shadow-inner border border-gray-200">
+      <table class="w-full text-sm text-left text-gray-700">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0">
+          <tr>
+            <th class="px-2 py-3">#</th>
+            <th class="px-2 py-3">Номгӯи китоб</th>
+            <th class="px-2 py-3">Категория</th>
+            <th class="px-2 py-3 hidden md:table-cell">№ Китоб</th>
+            <th class="px-2 py-3">Гиранда</th>
+            <th class="px-2 py-3 hidden md:table-cell">Сана</th>
+            <th class="px-2 py-3">Амал</th>
+          </tr>
+        </thead>
+        <tbody id="booksTableBody"></tbody>
+      </table>
+    </div>
+    <div class="text-center text-gray-500 mt-4 text-sm" id="noResultsMessage" style="display: none;">
+      <i class="fas fa-info-circle mr-1"></i> Ягон китоб ёфт нашуд
+    </div>
+  </div>
+
+  <!-- Модали гиранда -->
+  <div id="borrowModal" class="modal">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
+      <h3 class="text-xl font-bold mb-4">Қайди донишҷӯ</h3>
+      <input type="text" id="borrowerName" class="w-full border px-3 py-2 rounded-lg mb-3" placeholder="Номи донишҷӯ...">
+      <input type="date" id="borrowDate" class="w-full border px-3 py-2 rounded-lg mb-3">
+      <div class="flex justify-end gap-3 mt-4">
+        <button onclick="closeBorrowModal()" class="bg-gray-200 px-4 py-2 rounded-lg">Бекор</button>
+        <button onclick="confirmBorrow()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Сабт</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Модали иловаи китоб -->
+  <div id="addBookModal" class="modal">
+    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4">
+      <h3 class="text-xl font-bold mb-4">Иловаи китоби нав</h3>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="col-span-2">
+          <input type="text" id="newBookName" class="w-full border px-3 py-2 rounded-lg" placeholder="Номи китоб">
+        </div>
+        <div>
+          <select id="newBookCategory" class="w-full border px-3 py-2 rounded-lg">
+            <option value="БАДЕӢ">БАДЕӢ</option>
+            <option value="ТАЪЛИМӢ">ТАЪЛИМӢ</option>
+            <option value="ТАХАССУСӢ">ТАХАССУСӢ</option>
+            <option value="ПРЕЗИДЕНТ">ПРЕЗИДЕНТ</option>
+            <option value="ТОҶИКОН">ТОҶИКОН</option>
+          </select>
+        </div>
+        <div>
+          <input type="text" id="newBookNumber" class="w-full border px-3 py-2 rounded-lg" placeholder="№ Китоб">
+        </div>
+      </div>
+      <div class="flex justify-end gap-3 mt-4">
+        <button onclick="closeAddBookModal()" class="bg-gray-200 px-4 py-2 rounded-lg">Бекор</button>
+        <button onclick="addNewBook()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg">Илова</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let booksData = [];
+    let currentIndex = null;
+
+    // ========== ФУНКСИЯҲОИ АСОСӢ ==========
+    
+    function loadData() {
+      const stored = localStorage.getItem('rahima_library_v3');
+      if (stored) {
+        try {
+          booksData = JSON.parse(stored);
+          console.log('Маълумот бор шуд:', booksData.length, 'китоб');
+        } catch (e) {
+          booksData = [];
+          console.error('Хатогӣ дар хондани маълумот:', e);
+        }
+      } else {
+        booksData = [];
+        console.log('Ягон маълумоти захирашуда ёфт нашуд');
+      }
+      
+      // Тоза кардани маълумоти холи
+      booksData = booksData.filter(book => book && book.ном);
+      
+      renderBooks();
+      updateStats();
+    }
+
+    function saveData() {
+      localStorage.setItem('rahima_library_v3', JSON.stringify(booksData));
+      updateStats();
+      console.log('Маълумот сабт шуд:', booksData.length, 'китоб');
+    }
+
+    function updateStats() {
+      // Ҳисобкунии дақиқи ҳар як категория
+      const stats = {
+        all: booksData.length,
+        badii: 0,
+        talimi: 0,
+        takhasusi: 0,
+        president: 0,
+        tojikon: 0
+      };
+      
+      booksData.forEach(book => {
+        const cat = book.категория;
+        if (cat === 'БАДЕӢ') stats.badii++;
+        else if (cat === 'ТАЪЛИМӢ') stats.talimi++;
+        else if (cat === 'ТАХАССУСӢ') stats.takhasusi++;
+        else if (cat === 'ПРЕЗИДЕНТ') stats.president++;
+        else if (cat === 'ТОҶИКОН') stats.tojikon++;
+      });
+      
+      // Навсозии сарлавҳаҳо
+      document.getElementById('totalBooks').textContent = stats.all;
+      document.getElementById('totalBadii').textContent = stats.badii;
+      document.getElementById('totalTalimi').textContent = stats.talimi;
+      document.getElementById('totalTakhasusi').textContent = stats.takhasusi;
+      document.getElementById('totalPresident').textContent = stats.president;
+      document.getElementById('totalTojikon').textContent = stats.tojikon;
+      
+      console.log('Омор:', stats);
+    }
+
+    function normalizeCategory(cat) {
+      if (!cat) return 'БАДЕӢ';
+      
+      const c = cat.toString().toUpperCase().trim();
+      
+      if (c.includes('ТАЪЛИМ')) return 'ТАЪЛИМӢ';
+      if (c.includes('ТАХАССУС') || c.includes('ТАХАСУС')) return 'ТАХАССУСӢ';
+      if (c.includes('ПРЕЗИДЕНТ')) return 'ПРЕЗИДЕНТ';
+      if (c.includes('ТОҶИКОН') || c.includes('ТОЧИКОН')) return 'ТОҶИКОН';
+      if (c.includes('БАДЕ') || c.includes('БАДӢ')) return 'БАДЕӢ';
+      
+      return 'БАДЕӢ';
+    }
+
+    function renderBooks(data = booksData) {
+      const tbody = document.getElementById('booksTableBody');
+      const noRes = document.getElementById('noResultsMessage');
+      
+      if (!data || data.length === 0) {
+        tbody.innerHTML = '';
+        noRes.style.display = 'block';
+        return;
+      }
+      
+      noRes.style.display = 'none';
+      
+      tbody.innerHTML = data.map((book, index) => {
+        const realIndex = booksData.indexOf(book);
+        const hasBorrower = book.гиранда && book.гиранда.trim() !== '';
+        
+        return `
+          <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+            <td class="px-2 py-2 text-gray-500">${realIndex + 1}</td>
+            <td class="px-2 py-2 font-medium text-gray-900 max-w-[200px] truncate" title="${book.ном || ''}">
+              ${book.ном || 'Бе ном'}
+            </td>
+            <td class="px-2 py-2">
+              <span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                ${book.категория || 'БАДЕӢ'}
+              </span>
+            </td>
+            <td class="px-2 py-2 hidden md:table-cell text-gray-600">
+              ${book.рақам || '—'}
+            </td>
+            <td class="px-2 py-2">
+              <span class="font-semibold ${hasBorrower ? 'text-red-600 bg-red-50 px-2 py-0.5 rounded' : 'text-gray-400'}">
+                ${hasBorrower ? book.гиранда : '—'}
+              </span>
+            </td>
+            <td class="px-2 py-2 text-xs text-gray-500 hidden md:table-cell">
+              ${book.санаи_гирифтан || '—'}
+            </td>
+            <td class="px-2 py-2">
+              <div class="flex gap-1">
+                <button onclick="openBorrowModal(${realIndex})" 
+                        class="text-blue-600 hover:bg-blue-100 p-1.5 rounded transition" 
+                        title="Қайди гиранда">
+                  <i class="fas fa-user-edit"></i>
+                </button>
+                ${hasBorrower ? `
+                  <button onclick="clearBorrow(${realIndex})" 
+                          class="text-green-600 hover:bg-green-100 p-1.5 rounded transition" 
+                          title="Бозпас гирифтан">
+                    <i class="fas fa-check-circle"></i>
+                  </button>
+                ` : ''}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function filterBooks() {
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const category = document.getElementById('categoryFilter').value;
+      
+      const filtered = booksData.filter(book => {
+        const matchesSearch = !query || 
+          (book.ном && book.ном.toLowerCase().includes(query)) ||
+          (book.рақам && book.рақам.toString().includes(query)) ||
+          (book.гиранда && book.гиранда.toLowerCase().includes(query));
+        
+        const matchesCategory = !category || book.категория === category;
+        
+        return matchesSearch && matchesCategory;
+      });
+      
+      renderBooks(filtered);
+    }
+
+    function resetFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('categoryFilter').value = '';
+      renderBooks(booksData);
+    }
+
+    // ========== ВОРИДОТИ EXCEL ==========
+    
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+          
+          if (rows.length < 2) {
+            alert('Файл холӣ аст!');
+            return;
+          }
+          
+          const newBooks = [];
+          for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row || row.length < 5) continue;
+            
+            const name = row[1]?.toString().trim();
+            if (!name || name === '') continue;
+            
+            const category = normalizeCategory(row[4]);
+            
+            newBooks.push({
+              ном: name,
+              шумора: row[2]?.toString().trim() || '1',
+              нарх: row[3]?.toString().trim() || '',
+              категория: category,
+              рақам: row[5]?.toString().trim() || '',
+              санаи_асл: row[6]?.toString().trim() || '',
+              гиранда: '',
+              санаи_гирифтан: ''
+            });
+          }
+          
+          if (newBooks.length > 0) {
+            booksData = [...booksData, ...newBooks];
+            saveData();
+            renderBooks();
+            alert(`✅ ${newBooks.length} китоб бомуваффақият ворид шуд!\n\nКатегорияҳо:\n- Бадеӣ: ${newBooks.filter(b => b.категория === 'БАДЕӢ').length}\n- Таълимӣ: ${newBooks.filter(b => b.категория === 'ТАЪЛИМӢ').length}\n- Тахассусӣ: ${newBooks.filter(b => b.категория === 'ТАХАССУСӢ').length}\n- Президент: ${newBooks.filter(b => b.категория === 'ПРЕЗИДЕНТ').length}\n- Тоҷикон: ${newBooks.filter(b => b.категория === 'ТОҶИКОН').length}`);
+          } else {
+            alert('Ягон китоб барои воридот ёфт нашуд');
+          }
+        } catch (error) {
+          console.error('Хатогӣ дар хондани Excel:', error);
+          alert('Хатогӣ дар коркарди файл');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // ========== ҚАЙДИ ГИРАНДА ==========
+    
+    function openBorrowModal(index) {
+      currentIndex = index;
+      const book = booksData[index];
+      document.getElementById('borrowerName').value = book.гиранда || '';
+      document.getElementById('borrowDate').value = book.санаи_гирифтан || new Date().toISOString().split('T')[0];
+      document.getElementById('borrowModal').classList.add('active');
+    }
+
+    function closeBorrowModal() {
+      document.getElementById('borrowModal').classList.remove('active');
+      currentIndex = null;
+    }
+
+    function confirmBorrow() {
+      if (currentIndex === null) return;
+      
+      const name = document.getElementById('borrowerName').value.trim();
+      if (!name) {
+        alert('Лутфан номи донишҷӯро ворид кунед!');
+        return;
+      }
+      
+      booksData[currentIndex].гиранда = name;
+      booksData[currentIndex].санаи_гирифтан = document.getElementById('borrowDate').value;
+      
+      saveData();
+      renderBooks();
+      closeBorrowModal();
+      
+      alert(`✅ Китоб ба ${name} дода шуд`);
+    }
+
+    function clearBorrow(index) {
+      if (confirm('Оё мутмаин ҳастед, ки донишҷӯ китобро бозпас гардонид?')) {
+        booksData[index].гиранда = '';
+        booksData[index].санаи_гирифтан = '';
+        saveData();
+        renderBooks();
+      }
+    }
+
+    // ========== ИЛОВАИ КИТОБ ==========
+    
+    function openAddBookModal() {
+      document.getElementById('addBookModal').classList.add('active');
+    }
+
+    function closeAddBookModal() {
+      document.getElementById('addBookModal').classList.remove('active');
+    }
+
+    function addNewBook() {
+      const name = document.getElementById('newBookName').value.trim();
+      if (!name) {
+        alert('Номи китобро ворид кунед!');
+        return;
+      }
+      
+      const category = document.getElementById('newBookCategory').value;
+      const number = document.getElementById('newBookNumber').value.trim();
+      
+      booksData.push({
+        ном: name,
+        шумора: '1',
+        нарх: '',
+        категория: category,
+        рақам: number,
+        санаи_асл: new Date().toISOString().split('T')[0],
+        гиранда: '',
+        санаи_гирифтан: ''
+      });
+      
+      saveData();
+      renderBooks();
+      closeAddBookModal();
+      
+      // Тоза кардани форма
+      document.getElementById('newBookName').value = '';
+      document.getElementById('newBookNumber').value = '';
+      
+      alert('✅ Китоб илова шуд');
+    }
+
+    // ========== ЭКСПОРТ БА EXCEL ==========
+    
+    function exportToExcel() {
+      const exportData = booksData.map(book => ({
+        'Номи китоб': book.ном,
+        'Категория': book.категория,
+        '№ Китоб': book.рақам,
+        'Гиранда': book.гиранда || '',
+        'Санаи гирифтан': book.санаи_гирифтан || ''
+      }));
+      
+      const worksheet = XLSX.utils.json_to_sheet(exportData);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Китобҳо");
+      XLSX.writeFile(workbook, "китобхона_рахима.xlsx");
+    }
+
+    // ========== САНҶИШИ МАЪЛУМОТ ==========
+    
+    function checkStorageData() {
+      const stored = localStorage.getItem('rahima_library_v3');
+      const categories = {};
+      
+      booksData.forEach(book => {
+        const cat = book.категория;
+        categories[cat] = (categories[cat] || 0) + 1;
+      });
+      
+      let message = `📊 Вазъи пойгоҳи додаҳо:\n\n`;
+      message += `Ҳамаи китобҳо: ${booksData.length}\n\n`;
+      message += `Категорияҳо:\n`;
+      
+      for (const [cat, count] of Object.entries(categories)) {
+        message += `- ${cat}: ${count}\n`;
+      }
+      
+      message += `\n💾 Ҳофизаи браузер: ${stored ? 'Маълумот мавҷуд аст' : 'ХОЛӢ!'}`;
+      
+      alert(message);
+    }
+
+    // ========== ОҒОЗИ БАРНОМА ==========
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      loadData();
+      
+      document.getElementById('searchInput').addEventListener('input', filterBooks);
+      document.getElementById('categoryFilter').addEventListener('change', filterBooks);
+      
+      console.log('Барнома омода аст');
+    });
+
+    // Бастани модалҳо бо клик дар берун
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('active');
+      }
+    };
+  </script>
+</body>
+</html>
