@@ -15,130 +15,138 @@
     .modal.active { display: flex; }
     .stat-card { transition: all 0.2s; }
     .stat-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    
+    /* Барои мобил */
+    @media (max-width: 640px) {
+      .table-container { max-height: 60vh; }
+      td, th { padding: 6px 4px !important; font-size: 11px !important; }
+    }
   </style>
 </head>
-<body class="p-2 md:p-4">
+<body class="p-1 md:p-4">
 
-  <div id="app" class="max-w-7xl mx-auto bg-white shadow-2xl rounded-lg p-3 md:p-6">
+  <div id="app" class="max-w-7xl mx-auto bg-white shadow-2xl rounded-lg p-2 md:p-6">
     
     <!-- Сарлавҳа -->
-    <div class="flex flex-col md:flex-row justify-between items-center mb-4 border-b pb-4 gap-3">
-      <h1 class="text-xl md:text-3xl font-bold text-gray-800 flex items-center gap-2">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-3 border-b pb-3 gap-2">
+      <h1 class="text-lg md:text-3xl font-bold text-gray-800 flex items-center gap-2">
         <i class="fas fa-book-open text-blue-600"></i> 
         Китобхонаи Раҳима
       </h1>
-      <div class="flex flex-wrap gap-2">
-        <button onclick="document.getElementById('fileInput').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg shadow text-sm transition">
-          <i class="fas fa-upload mr-1"></i> Воридоти Excel
+      <div class="flex flex-wrap gap-1.5">
+        <button onclick="document.getElementById('fileInput').click()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1.5 rounded-lg shadow text-xs md:text-sm transition">
+          <i class="fas fa-upload mr-1"></i> Excel
         </button>
         <input type="file" id="fileInput" accept=".xlsx, .xls" class="hidden" onchange="handleFileUpload(event)">
         
-        <button onclick="openAddBookModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg shadow text-sm transition">
-          <i class="fas fa-plus mr-1"></i> Иловаи китоб
+        <button onclick="openAddBookModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg shadow text-xs md:text-sm transition">
+          <i class="fas fa-plus mr-1"></i> Китоб
         </button>
         
-        <button onclick="exportToExcel()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-lg shadow text-sm transition">
+        <button onclick="exportToExcel()" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1.5 rounded-lg shadow text-xs md:text-sm transition">
           <i class="fas fa-download mr-1"></i> Захира
         </button>
         
-        <button onclick="checkStorageData()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-2 rounded-lg shadow text-sm transition">
+        <button onclick="checkStorageData()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-2.5 py-1.5 rounded-lg shadow text-xs md:text-sm transition">
           <i class="fas fa-database mr-1"></i> Санҷиш
         </button>
       </div>
     </div>
 
     <!-- Сарлавҳаҳои оморӣ -->
-    <div class="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3 mb-6">
-      <div class="stat-card bg-slate-100 p-3 rounded-lg text-center">
+    <div class="grid grid-cols-3 md:grid-cols-6 gap-1.5 md:gap-3 mb-4">
+      <div class="stat-card bg-slate-100 p-2 md:p-3 rounded-lg text-center">
         <p class="text-xs text-gray-600">Ҳама</p>
-        <p id="totalBooks" class="text-2xl font-bold text-gray-800">0</p>
+        <p id="totalBooks" class="text-lg md:text-2xl font-bold text-gray-800">0</p>
       </div>
-      <div class="stat-card bg-orange-50 p-3 rounded-lg text-center">
+      <div class="stat-card bg-orange-50 p-2 md:p-3 rounded-lg text-center">
         <p class="text-xs text-orange-600">Бадеӣ</p>
-        <p id="totalBadii" class="text-2xl font-bold text-orange-800">0</p>
+        <p id="totalBadii" class="text-lg md:text-2xl font-bold text-orange-800">0</p>
       </div>
-      <div class="stat-card bg-green-50 p-3 rounded-lg text-center">
+      <div class="stat-card bg-green-50 p-2 md:p-3 rounded-lg text-center">
         <p class="text-xs text-green-600">Таълимӣ</p>
-        <p id="totalTalimi" class="text-2xl font-bold text-green-800">0</p>
+        <p id="totalTalimi" class="text-lg md:text-2xl font-bold text-green-800">0</p>
       </div>
-      <div class="stat-card bg-purple-50 p-3 rounded-lg text-center">
+      <div class="stat-card bg-purple-50 p-2 md:p-3 rounded-lg text-center">
         <p class="text-xs text-purple-600">Тахассусӣ</p>
-        <p id="totalTakhasusi" class="text-2xl font-bold text-purple-800">0</p>
+        <p id="totalTakhasusi" class="text-lg md:text-2xl font-bold text-purple-800">0</p>
       </div>
-      <div class="stat-card bg-rose-50 p-3 rounded-lg text-center">
+      <div class="stat-card bg-rose-50 p-2 md:p-3 rounded-lg text-center">
         <p class="text-xs text-rose-600">Президент</p>
-        <p id="totalPresident" class="text-2xl font-bold text-rose-800">0</p>
+        <p id="totalPresident" class="text-lg md:text-2xl font-bold text-rose-800">0</p>
       </div>
-      <div class="stat-card bg-cyan-50 p-3 rounded-lg text-center">
+      <div class="stat-card bg-cyan-50 p-2 md:p-3 rounded-lg text-center">
         <p class="text-xs text-cyan-600">Тоҷикон</p>
-        <p id="totalTojikon" class="text-2xl font-bold text-cyan-800">0</p>
+        <p id="totalTojikon" class="text-lg md:text-2xl font-bold text-cyan-800">0</p>
       </div>
     </div>
 
     <!-- Филтрҳо -->
-    <div class="flex flex-col md:flex-row gap-2 mb-4">
+    <div class="flex flex-col sm:flex-row gap-1.5 mb-3">
       <div class="relative flex-grow">
-        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-        <input type="text" id="searchInput" placeholder="Ҷустуҷӯ аз рӯи ном, № китоб ё гиранда..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 text-sm">
+        <i class="fas fa-search absolute left-2.5 top-2.5 text-gray-400 text-sm"></i>
+        <input type="text" id="searchInput" placeholder="Ҷустуҷӯ аз рӯи ном, № китоб ё гиранда..." class="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 text-sm">
       </div>
-      <select id="categoryFilter" class="border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-blue-400 text-sm bg-white">
-        <option value="">Ҳамаи категорияҳо</option>
-        <option value="БАДЕӢ">БАДЕӢ</option>
-        <option value="ТАЪЛИМӢ">ТАЪЛИМӢ</option>
-        <option value="ТАХАССУСӢ">ТАХАССУСӢ</option>
-        <option value="ПРЕЗИДЕНТ">ПРЕЗИДЕНТ</option>
-        <option value="ТОҶИКОН">ТОҶИКОН</option>
-      </select>
-      <button onclick="resetFilters()" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2.5 rounded-lg transition text-sm">
-        <i class="fas fa-sync-alt"></i>
-      </button>
+      <div class="flex gap-1.5">
+        <select id="categoryFilter" class="border border-gray-300 rounded-lg px-2 py-2 focus:ring-2 focus:ring-blue-400 text-sm bg-white">
+          <option value="">Ҳамаи категорияҳо</option>
+          <option value="БАДЕӢ">БАДЕӢ</option>
+          <option value="ТАЪЛИМӢ">ТАЪЛИМӢ</option>
+          <option value="ТАХАССУСӢ">ТАХАССУСӢ</option>
+          <option value="ПРЕЗИДЕНТ">ПРЕЗИДЕНТ</option>
+          <option value="ТОҶИКОН">ТОҶИКОН</option>
+        </select>
+        <button onclick="resetFilters()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition text-sm">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
     </div>
 
     <!-- Ҷадвали китобҳо -->
     <div class="table-container shadow-inner border border-gray-200">
-      <table class="w-full text-sm text-left text-gray-700">
+      <table class="w-full text-xs md:text-sm text-left text-gray-700">
         <thead class="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0">
           <tr>
-            <th class="px-2 py-3">#</th>
-            <th class="px-2 py-3">Номгӯи китоб</th>
-            <th class="px-2 py-3">Категория</th>
-            <th class="px-2 py-3 hidden md:table-cell">№ Китоб</th>
-            <th class="px-2 py-3">Гиранда</th>
-            <th class="px-2 py-3 hidden md:table-cell">Сана</th>
-            <th class="px-2 py-3">Амал</th>
+            <th class="px-1.5 md:px-2 py-2">#</th>
+            <th class="px-1.5 md:px-2 py-2">Номгӯи китоб</th>
+            <th class="px-1.5 md:px-2 py-2">Кат.</th>
+            <th class="px-1.5 md:px-2 py-2">№ Китоб</th>
+            <th class="px-1.5 md:px-2 py-2">Гиранда</th>
+            <th class="px-1.5 md:px-2 py-2 hidden sm:table-cell">Сана</th>
+            <th class="px-1.5 md:px-2 py-2">Амал</th>
           </tr>
         </thead>
         <tbody id="booksTableBody"></tbody>
       </table>
     </div>
-    <div class="text-center text-gray-500 mt-4 text-sm" id="noResultsMessage" style="display: none;">
+    <div class="text-center text-gray-500 mt-3 text-xs" id="noResultsMessage" style="display: none;">
       <i class="fas fa-info-circle mr-1"></i> Ягон китоб ёфт нашуд
     </div>
   </div>
 
   <!-- Модали гиранда -->
   <div id="borrowModal" class="modal">
-    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
-      <h3 class="text-xl font-bold mb-4">Қайди донишҷӯ</h3>
-      <input type="text" id="borrowerName" class="w-full border px-3 py-2 rounded-lg mb-3" placeholder="Номи донишҷӯ...">
-      <input type="date" id="borrowDate" class="w-full border px-3 py-2 rounded-lg mb-3">
-      <div class="flex justify-end gap-3 mt-4">
-        <button onclick="closeBorrowModal()" class="bg-gray-200 px-4 py-2 rounded-lg">Бекор</button>
-        <button onclick="confirmBorrow()" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Сабт</button>
+    <div class="bg-white rounded-xl shadow-2xl p-5 w-full max-w-sm mx-3">
+      <h3 class="text-lg font-bold mb-3">Қайди донишҷӯ</h3>
+      <input type="text" id="borrowerName" class="w-full border px-3 py-2 rounded-lg mb-2 text-sm" placeholder="Номи донишҷӯ...">
+      <input type="date" id="borrowDate" class="w-full border px-3 py-2 rounded-lg mb-2 text-sm">
+      <div class="flex justify-end gap-2 mt-3">
+        <button onclick="closeBorrowModal()" class="bg-gray-200 px-3 py-1.5 rounded-lg text-sm">Бекор</button>
+        <button onclick="confirmBorrow()" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm">Сабт</button>
       </div>
     </div>
   </div>
 
   <!-- Модали иловаи китоб -->
   <div id="addBookModal" class="modal">
-    <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4">
-      <h3 class="text-xl font-bold mb-4">Иловаи китоби нав</h3>
-      <div class="grid grid-cols-2 gap-3">
+    <div class="bg-white rounded-xl shadow-2xl p-5 w-full max-w-md mx-3">
+      <h3 class="text-lg font-bold mb-3">Иловаи китоби нав</h3>
+      <div class="grid grid-cols-2 gap-2">
         <div class="col-span-2">
-          <input type="text" id="newBookName" class="w-full border px-3 py-2 rounded-lg" placeholder="Номи китоб">
+          <input type="text" id="newBookName" class="w-full border px-3 py-2 rounded-lg text-sm" placeholder="Номи китоб">
         </div>
         <div>
-          <select id="newBookCategory" class="w-full border px-3 py-2 rounded-lg">
+          <select id="newBookCategory" class="w-full border px-3 py-2 rounded-lg text-sm">
             <option value="БАДЕӢ">БАДЕӢ</option>
             <option value="ТАЪЛИМӢ">ТАЪЛИМӢ</option>
             <option value="ТАХАССУСӢ">ТАХАССУСӢ</option>
@@ -147,12 +155,12 @@
           </select>
         </div>
         <div>
-          <input type="text" id="newBookNumber" class="w-full border px-3 py-2 rounded-lg" placeholder="№ Китоб">
+          <input type="text" id="newBookNumber" class="w-full border px-3 py-2 rounded-lg text-sm" placeholder="№ Китоб">
         </div>
       </div>
-      <div class="flex justify-end gap-3 mt-4">
-        <button onclick="closeAddBookModal()" class="bg-gray-200 px-4 py-2 rounded-lg">Бекор</button>
-        <button onclick="addNewBook()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg">Илова</button>
+      <div class="flex justify-end gap-2 mt-3">
+        <button onclick="closeAddBookModal()" class="bg-gray-200 px-3 py-1.5 rounded-lg text-sm">Бекор</button>
+        <button onclick="addNewBook()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-lg text-sm">Илова</button>
       </div>
     </div>
   </div>
@@ -164,7 +172,7 @@
     // ========== ФУНКСИЯҲОИ АСОСӢ ==========
     
     function loadData() {
-      const stored = localStorage.getItem('rahima_library_v3');
+      const stored = localStorage.getItem('rahima_library_v4');
       if (stored) {
         try {
           booksData = JSON.parse(stored);
@@ -178,21 +186,17 @@
         console.log('Ягон маълумоти захирашуда ёфт нашуд');
       }
       
-      // Тоза кардани маълумоти холи
       booksData = booksData.filter(book => book && book.ном);
-      
       renderBooks();
       updateStats();
     }
 
     function saveData() {
-      localStorage.setItem('rahima_library_v3', JSON.stringify(booksData));
+      localStorage.setItem('rahima_library_v4', JSON.stringify(booksData));
       updateStats();
-      console.log('Маълумот сабт шуд:', booksData.length, 'китоб');
     }
 
     function updateStats() {
-      // Ҳисобкунии дақиқи ҳар як категория
       const stats = {
         all: booksData.length,
         badii: 0,
@@ -211,28 +215,22 @@
         else if (cat === 'ТОҶИКОН') stats.tojikon++;
       });
       
-      // Навсозии сарлавҳаҳо
       document.getElementById('totalBooks').textContent = stats.all;
       document.getElementById('totalBadii').textContent = stats.badii;
       document.getElementById('totalTalimi').textContent = stats.talimi;
       document.getElementById('totalTakhasusi').textContent = stats.takhasusi;
       document.getElementById('totalPresident').textContent = stats.president;
       document.getElementById('totalTojikon').textContent = stats.tojikon;
-      
-      console.log('Омор:', stats);
     }
 
     function normalizeCategory(cat) {
       if (!cat) return 'БАДЕӢ';
-      
       const c = cat.toString().toUpperCase().trim();
-      
       if (c.includes('ТАЪЛИМ')) return 'ТАЪЛИМӢ';
       if (c.includes('ТАХАССУС') || c.includes('ТАХАСУС')) return 'ТАХАССУСӢ';
       if (c.includes('ПРЕЗИДЕНТ')) return 'ПРЕЗИДЕНТ';
       if (c.includes('ТОҶИКОН') || c.includes('ТОЧИКОН')) return 'ТОҶИКОН';
       if (c.includes('БАДЕ') || c.includes('БАДӢ')) return 'БАДЕӢ';
-      
       return 'БАДЕӢ';
     }
 
@@ -254,36 +252,37 @@
         
         return `
           <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-            <td class="px-2 py-2 text-gray-500">${realIndex + 1}</td>
-            <td class="px-2 py-2 font-medium text-gray-900 max-w-[200px] truncate" title="${book.ном || ''}">
+            <td class="px-1.5 md:px-2 py-1.5 text-gray-500">${realIndex + 1}</td>
+            <td class="px-1.5 md:px-2 py-1.5 font-medium text-gray-900 max-w-[120px] md:max-w-[200px] truncate" title="${book.ном || ''}">
               ${book.ном || 'Бе ном'}
             </td>
-            <td class="px-2 py-2">
-              <span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-xs font-medium">
-                ${book.категория || 'БАДЕӢ'}
+            <td class="px-1.5 md:px-2 py-1.5">
+              <span class="bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded-full text-xs font-medium">
+                ${book.категория === 'БАДЕӢ' ? 'Б' : book.категория === 'ТАЪЛИМӢ' ? 'Тъ' : book.категория === 'ТАХАССУСӢ' ? 'Тх' : book.категория === 'ПРЕЗИДЕНТ' ? 'П' : book.категория === 'ТОҶИКОН' ? 'Тҷ' : book.категория || 'Б'}
               </span>
+              <span class="hidden sm:inline text-xs text-gray-500 ml-1">${book.категория || 'БАДЕӢ'}</span>
             </td>
-            <td class="px-2 py-2 hidden md:table-cell text-gray-600">
+            <td class="px-1.5 md:px-2 py-1.5 text-gray-700 font-mono text-xs">
               ${book.рақам || '—'}
             </td>
-            <td class="px-2 py-2">
-              <span class="font-semibold ${hasBorrower ? 'text-red-600 bg-red-50 px-2 py-0.5 rounded' : 'text-gray-400'}">
-                ${hasBorrower ? book.гиранда : '—'}
+            <td class="px-1.5 md:px-2 py-1.5">
+              <span class="font-semibold text-xs ${hasBorrower ? 'text-red-600 bg-red-50 px-1.5 py-0.5 rounded' : 'text-gray-400'}">
+                ${hasBorrower ? book.гиранда.substring(0, 15) : '—'}
               </span>
             </td>
-            <td class="px-2 py-2 text-xs text-gray-500 hidden md:table-cell">
+            <td class="px-1.5 md:px-2 py-1.5 text-xs text-gray-500 hidden sm:table-cell">
               ${book.санаи_гирифтан || '—'}
             </td>
-            <td class="px-2 py-2">
-              <div class="flex gap-1">
+            <td class="px-1.5 md:px-2 py-1.5">
+              <div class="flex gap-0.5">
                 <button onclick="openBorrowModal(${realIndex})" 
-                        class="text-blue-600 hover:bg-blue-100 p-1.5 rounded transition" 
+                        class="text-blue-600 hover:bg-blue-100 p-1 rounded transition text-xs" 
                         title="Қайди гиранда">
                   <i class="fas fa-user-edit"></i>
                 </button>
                 ${hasBorrower ? `
                   <button onclick="clearBorrow(${realIndex})" 
-                          class="text-green-600 hover:bg-green-100 p-1.5 rounded transition" 
+                          class="text-green-600 hover:bg-green-100 p-1 rounded transition text-xs" 
                           title="Бозпас гирифтан">
                     <i class="fas fa-check-circle"></i>
                   </button>
@@ -319,8 +318,6 @@
       renderBooks(booksData);
     }
 
-    // ========== ВОРИДОТИ EXCEL ==========
-    
     function handleFileUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -364,20 +361,18 @@
             booksData = [...booksData, ...newBooks];
             saveData();
             renderBooks();
-            alert(`✅ ${newBooks.length} китоб бомуваффақият ворид шуд!\n\nКатегорияҳо:\n- Бадеӣ: ${newBooks.filter(b => b.категория === 'БАДЕӢ').length}\n- Таълимӣ: ${newBooks.filter(b => b.категория === 'ТАЪЛИМӢ').length}\n- Тахассусӣ: ${newBooks.filter(b => b.категория === 'ТАХАССУСӢ').length}\n- Президент: ${newBooks.filter(b => b.категория === 'ПРЕЗИДЕНТ').length}\n- Тоҷикон: ${newBooks.filter(b => b.категория === 'ТОҶИКОН').length}`);
+            alert(`✅ ${newBooks.length} китоб ворид шуд!`);
           } else {
-            alert('Ягон китоб барои воридот ёфт нашуд');
+            alert('Ягон китоб ёфт нашуд');
           }
         } catch (error) {
-          console.error('Хатогӣ дар хондани Excel:', error);
+          console.error(error);
           alert('Хатогӣ дар коркарди файл');
         }
       };
       reader.readAsArrayBuffer(file);
     }
 
-    // ========== ҚАЙДИ ГИРАНДА ==========
-    
     function openBorrowModal(index) {
       currentIndex = index;
       const book = booksData[index];
@@ -396,7 +391,7 @@
       
       const name = document.getElementById('borrowerName').value.trim();
       if (!name) {
-        alert('Лутфан номи донишҷӯро ворид кунед!');
+        alert('Номи донишҷӯро ворид кунед!');
         return;
       }
       
@@ -406,12 +401,10 @@
       saveData();
       renderBooks();
       closeBorrowModal();
-      
-      alert(`✅ Китоб ба ${name} дода шуд`);
     }
 
     function clearBorrow(index) {
-      if (confirm('Оё мутмаин ҳастед, ки донишҷӯ китобро бозпас гардонид?')) {
+      if (confirm('Китоб бозпас гирифта шуд?')) {
         booksData[index].гиранда = '';
         booksData[index].санаи_гирифтан = '';
         saveData();
@@ -419,8 +412,6 @@
       }
     }
 
-    // ========== ИЛОВАИ КИТОБ ==========
-    
     function openAddBookModal() {
       document.getElementById('addBookModal').classList.add('active');
     }
@@ -454,15 +445,10 @@
       renderBooks();
       closeAddBookModal();
       
-      // Тоза кардани форма
       document.getElementById('newBookName').value = '';
       document.getElementById('newBookNumber').value = '';
-      
-      alert('✅ Китоб илова шуд');
     }
 
-    // ========== ЭКСПОРТ БА EXCEL ==========
-    
     function exportToExcel() {
       const exportData = booksData.map(book => ({
         'Номи китоб': book.ном,
@@ -478,42 +464,26 @@
       XLSX.writeFile(workbook, "китобхона_рахима.xlsx");
     }
 
-    // ========== САНҶИШИ МАЪЛУМОТ ==========
-    
     function checkStorageData() {
-      const stored = localStorage.getItem('rahima_library_v3');
       const categories = {};
-      
       booksData.forEach(book => {
         const cat = book.категория;
         categories[cat] = (categories[cat] || 0) + 1;
       });
       
-      let message = `📊 Вазъи пойгоҳи додаҳо:\n\n`;
-      message += `Ҳамаи китобҳо: ${booksData.length}\n\n`;
-      message += `Категорияҳо:\n`;
-      
+      let message = `📊 Вазъи пойгоҳ:\n\nҲама: ${booksData.length}\n\n`;
       for (const [cat, count] of Object.entries(categories)) {
         message += `- ${cat}: ${count}\n`;
       }
-      
-      message += `\n💾 Ҳофизаи браузер: ${stored ? 'Маълумот мавҷуд аст' : 'ХОЛӢ!'}`;
-      
       alert(message);
     }
 
-    // ========== ОҒОЗИ БАРНОМА ==========
-    
     document.addEventListener('DOMContentLoaded', function() {
       loadData();
-      
       document.getElementById('searchInput').addEventListener('input', filterBooks);
       document.getElementById('categoryFilter').addEventListener('change', filterBooks);
-      
-      console.log('Барнома омода аст');
     });
 
-    // Бастани модалҳо бо клик дар берун
     window.onclick = function(event) {
       if (event.target.classList.contains('modal')) {
         event.target.classList.remove('active');
